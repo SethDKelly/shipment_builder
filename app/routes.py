@@ -47,6 +47,7 @@ def json_data():
     
     return (build_shipments.build_shipments(clean.clean_csv())
                            .to_json(orient='records')
+           )
 
 @app.route("/grouped_shipments")
 def group_by_shipment():
@@ -66,10 +67,6 @@ def group_by_shipment():
                            titles = ['All Shipments'],
                            shipment_size=len(shipment_view.index)
                           )
- 
-    
-
-           )
 
 if __name__ == "__main__":
     app.run(debug=True)
