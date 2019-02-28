@@ -1,0 +1,12 @@
+The items.csv file is structured as such:
+
+item_id	  item_group  cubic_volume_ft
+10413	  A	          0.1
+10341	  A	          0.5
+10004	  B	          1.0
+80014	  C	          0.3
+20242	  B	          0.4
+…	      …	          …
+
+Each record in this csv file is representative of a single item.
+The item_id field is a unique identifier for the item, while the item_type and cubic_volume_ft fields are attributes of the item.

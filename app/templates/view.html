@@ -1,0 +1,20 @@
+<!doctype html>
+{% extends "base.html" %}
+
+{% block content %}
+<title>Simple tables</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+<div class=page>
+    
+    {% if shipment_size %}
+        <h1>{{ shipment_size }} Total Shipments</h1>
+    {% else %}
+        <h1>Total Shipments:</h1>
+    {% endif %}
+    
+  {% for table in tables %}
+    <h2>{{titles[loop.index]}}</h2>
+    {{ table|safe }}
+  {% endfor %}
+</div>
+{% endblock %}
