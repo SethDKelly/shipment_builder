@@ -8,7 +8,11 @@
 * ~~Include header~~
 * ~~Build shipment, data, and group routes~~
 
-### To-do Tasks
+### To-do Tasks in quasi order
+* Update shipment building module naming schema
+* Build group by item_id functionality
+* Build summary table function
+ * Add to view.html to properly display
 * Build data creation
  * Will use test.csv to build from
  * Will create multiple .csv
