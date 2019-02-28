@@ -41,6 +41,12 @@ def shipments_by_item():
                            titles = ['All Items and their Shipments'], 
                            shipment_size=len(shipments.package_id.unique())
                           )
+@app.route("/shipments/json")
+def json_data():
+    import pandas as pd
+    
+    return (build_shipments.build_shipments(clean.clean_csv())
+                           .to_json(orient='records')
 
 @app.route("/grouped_shipments")
 def group_by_shipment():
@@ -62,12 +68,7 @@ def group_by_shipment():
                           )
  
     
-@app.route("/json")
-def json_data():
-    import pandas as pd
-    
-    return (build_shipments.build_shipments(clean.clean_csv())
-                           .to_json(orient='records')
+
            )
 
 if __name__ == "__main__":
