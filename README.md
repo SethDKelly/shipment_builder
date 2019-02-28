@@ -6,12 +6,13 @@
 * ~~Build Model~~
 * ~~Build initial flask app~~
 * ~~Include header~~
-* ~~Build shipment, data, and group routes~~
+* ~~Build shipment, data, and group routes~~ (Prior to 2/28/19)
+* ~~Update shipment building module naming schema~~ (2/28/19)
+* ~~Build summary table function~~
+ * ~~Add summary tables to route functions for display~~
 
 ### To-do Tasks in quasi order
-* Update shipment building module naming schema
 * Build group by item_id functionality
-* Build summary table function
  * Add to view.html to properly display
 * Build data creation
  * Will use test.csv to build from
