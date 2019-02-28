@@ -1,6 +1,6 @@
 # import modules
 from app import app
-from app.shipment_builder import build_shipments
+from app.builder import build
 from app import clean
 
 # import libraries
@@ -23,29 +23,32 @@ def show_data():
     import pandas as pd
     
     stock = clean.clean_csv()
+    summary = build.summary(stock)
     
     return render_template('view.html',
-                           tables=[stock.to_html(classes='shipments_all')],
+                           tables=[summary.to_html(classes='shipments_all'),
+                                   stock.to_html(classes='shipments_all')],
                            titles = ['All Items and their Shipments'])
 
 @app.route("/shipments")
-def shipments_by_item():
+def shipments():
     import pandas as pd
     
     stock = clean.clean_csv()
-    shipments = build_shipments.build_shipments(stock)
-    length = len(shipments.package_id.unique())
+    shipments = build.shipments(stock)
+    summary = build.summary(shipments)
     
     return render_template('view.html',
-                           tables=[shipments.to_html(classes='shipments_all')],
+                           tables=[summary.to_html(classes='shipments_all'),
+                                   shipments.to_html(classes='shipments_all')],
                            titles = ['All Items and their Shipments'], 
-                           shipment_size=len(shipments.package_id.unique())
+                           shipment_size=summary['Total Shipments']
                           )
 @app.route("/shipments/json")
 def json_data():
     import pandas as pd
     
-    return (build_shipments.build_shipments(clean.clean_csv())
+    return (build.shipments(clean.clean_csv())
                            .to_json(orient='records')
            )
 
@@ -54,7 +57,7 @@ def group_by_shipment():
     import pandas as pd
     
     stock = clean.clean_csv()
-    shipments = build_shipments.build_shipments(stock)
+    shipments = build.shipments(stock)
     
     shipment_view = (shipments.drop(['item_id', 'item_group'],
                                     axis=1)
