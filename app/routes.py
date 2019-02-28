@@ -42,7 +42,7 @@ def shipments():
                            tables=[summary.to_html(classes='shipments_all'),
                                    shipments.to_html(classes='shipments_all')],
                            titles = ['All Items and their Shipments'], 
-                           shipment_size=summary['Total Shipments']
+                           shipment_size=summary['Total Shipments'][0]
                           )
 @app.route("/shipments/json")
 def json_data():
