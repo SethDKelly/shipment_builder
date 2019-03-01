@@ -1,6 +1,7 @@
 def generate_shipment_id():
     
-    import time
-    import random
+    # Generates an interger shipment id based on datetime
+    #Year Month Day Hour Minute Seconds Milleseconds
     
-    return str(time.clock()) + str(random.randint(0,1000)/1000)
+    import re
+    return int(re.sub("[^0-9]", "", str(datetime.datetime.today()))[:17])
