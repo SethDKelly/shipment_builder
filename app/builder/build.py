@@ -1,7 +1,7 @@
 from app.builder import generate_shipment_id as gen_id
 import pandas as pd
 
-def stock():
+def items():
     import glob
     
     # It's nice to assume clean data, and to be right for once
