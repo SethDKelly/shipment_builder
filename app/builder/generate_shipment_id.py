@@ -4,4 +4,6 @@ def generate_shipment_id():
     #Year Month Day Hour Minute Seconds Milleseconds
     
     import re
+    import datetime
+    
     return int(re.sub("[^0-9]", "", str(datetime.datetime.today()))[:17])
