@@ -2,14 +2,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-<title>Simple tables</title>
+<title>Dataframe Displays</title>
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
 <div class=page>
     
     {% if shipment_size %}
         <h1>{{ shipment_size }} Total Shipments</h1>
     {% else %}
-        <h1>Total Shipments:</h1>
+        <h1>Items in Order:</h1>
     {% endif %}
     
   {% for table in tables %}
