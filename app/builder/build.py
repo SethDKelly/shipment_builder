@@ -1,6 +1,19 @@
 from app.builder import generate_shipment_id as gen_id
 import pandas as pd
 
+def stock():
+    import glob
+    
+    # It's nice to assume clean data, and to be right for once
+    
+    stock = pd.DataFrame()
+    for csv in glob.glob("app/data/tmp/*.csv"):
+        stock = stock.append(pd.read_csv(csv))
+    
+    return stock
+        
+    
+
 def shipments(stock) :
     # Create a blank shipment sheet
     shipments = pd.DataFrame()
