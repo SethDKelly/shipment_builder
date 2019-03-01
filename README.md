@@ -13,12 +13,12 @@
 
 ### To-do Tasks in quasi order
 * Build group by item_id functionality
- * Add to view.html to properly display
+Add to view.html to properly display
 * Build data creation
- * ~~Prototype~~
- * Will use test.csv to build from
- * Will create multiple .csv
- * Imitates multiple orders coming in at a time for shipment
+~~Prototype~~
+Will use test.csv to build from
+Will create multiple .csv
+Imitates multiple orders coming in at a time for shipment
 * Update index page for shipment building and data creation buttons
 * Static tables on routing
 * Build SQLite db to host after files have been created
