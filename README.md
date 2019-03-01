@@ -15,6 +15,7 @@
 * Build group by item_id functionality
  * Add to view.html to properly display
 * Build data creation
+ * ~~Prototype~~
  * Will use test.csv to build from
  * Will create multiple .csv
  * Imitates multiple orders coming in at a time for shipment
