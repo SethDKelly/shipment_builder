@@ -25,7 +25,7 @@ def show_data():
     stock = clean.clean_csv()
     summary = build.summary(stock)
     
-    return render_template('view.html',
+    return render_template('table_viewer.html',
                            tables=[summary.to_html(classes='shipments_all'),
                                    stock.to_html(classes='shipments_all')],
                            titles = ['All Items and their Shipments'])
@@ -38,7 +38,7 @@ def shipments():
     shipments = build.shipments(stock)
     summary = build.summary(shipments)
     
-    return render_template('view.html',
+    return render_template('table_viewer.html',
                            tables=[summary.to_html(classes='shipments_all'),
                                    shipments.to_html(classes='shipments_all')],
                            titles = ['All Items and their Shipments'], 
@@ -51,6 +51,10 @@ def json_data():
     return (build.shipments(clean.clean_csv())
                            .to_json(orient='records')
            )
+
+#@app.route('/<some_place>')
+#def some_place_page(some_place):
+#    return(HTML_TEMPLATE.substitute(place_name=some_place))
 
 @app.route("/grouped_shipments")
 def group_by_shipment():
@@ -65,7 +69,7 @@ def group_by_shipment():
                               .agg(['count','sum'])
                     )["cubic_volume_ft"]
     
-    return render_template('view.html',
+    return render_template('table_viewer.html',
                            tables=[shipment_view.to_html(classes='shipments_all')],
                            titles = ['All Shipments'],
                            shipment_size=len(shipment_view.index)
