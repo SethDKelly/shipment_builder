@@ -2,8 +2,10 @@
 from app import app
 from app.builder import build
 from app import clean
+from app import grouping
 
 # import libraries
+import pandas as pd
 from flask import render_template, Response
 
 # create route that renders index.html template
@@ -11,7 +13,14 @@ from flask import render_template, Response
 @app.route("/index")
 def index():
 
+    # Build shipments
+    
+    # Generate data
+    
     return render_template("index.html", title="Home")
+
+stock = clean.clean_csv()
+shipments = build.shipments(stock)
 
 @app.route("/notes")
 def notes():
@@ -19,10 +28,7 @@ def notes():
         return Response(notes.read(), mimetype='text/plain')
     
 @app.route("/data")
-def show_data():
-    import pandas as pd
-    
-    stock = clean.clean_csv()
+def show_data():    
     summary = build.summary(stock)
     
     return render_template('table_viewer.html',
@@ -31,11 +37,7 @@ def show_data():
                            titles = ['All Items and their Shipments'])
 
 @app.route("/shipments")
-def shipments():
-    import pandas as pd
-    
-    stock = clean.clean_csv()
-    shipments = build.shipments(stock)
+def show_shipments():
     summary = build.summary(shipments)
     
     return render_template('table_viewer.html',
@@ -46,28 +48,22 @@ def shipments():
                           )
 
 @app.route("/shipments/json")
-def json_data():
-    import pandas as pd
-    
-    return (build.shipments(clean.clean_csv())
-                           .to_json(orient='records')
-           )
+def shipment_json_data(shipments):
+    return shipments.to_json(orient='records')
+
+shipments_filtered = {}
+for group in grouping.get_groups(stock):
+    stock_filtered = stock[stock.item_group.values == group]
+    shipments_filtered[group] = build.shipments(stock_filtered)
 
 @app.route('/item_group/<group>')
-def some_place_page(group):
-    import pandas as pd
+def show_by_group(group):
     
-    # Pull in stock data and filter by group
-    stock = clean.clean_csv()
-    stock = stock[stock.item_group.values == group]
-    
-    # Build shipment and summary tables after filtering
-    shipments = build.shipments(stock)
-    summary = build.summary(shipments)
+    summary = build.summary(shipments_filtered[group])
     
     return render_template('table_viewer.html',
                            tables=[summary.to_html(classes='shipments_all'),
-                                   shipments.to_html(classes='shipments_all')],
+                                   shipments_filtered[group].to_html(classes='shipments_all')],
                            titles = ['All Items and their Shipments'], 
                            shipment_size=summary['Total Shipments'][0]
                           )

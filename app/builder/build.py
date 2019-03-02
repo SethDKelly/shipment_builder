@@ -12,8 +12,6 @@ def items():
     
     return stock
         
-    
-
 def shipments(stock) :
     # Create a blank shipment sheet
     shipments = pd.DataFrame()
