@@ -52,27 +52,23 @@ def json_data():
                            .to_json(orient='records')
            )
 
-#@app.route('/<some_place>')
-#def some_place_page(some_place):
-#    return(HTML_TEMPLATE.substitute(place_name=some_place))
-
-@app.route("/grouped_shipments")
-def group_by_shipment():
+@app.route('/item_group/<group>')
+def some_place_page(group):
     import pandas as pd
     
+    # Pull in stock data and filter by group
     stock = clean.clean_csv()
-    shipments = build.shipments(stock)
+    stock = stock[stock.item_group.values == group]
     
-    shipment_view = (shipments.drop(['item_id', 'item_group'],
-                                    axis=1)
-                              .groupby('package_id')
-                              .agg(['count','sum'])
-                    )["cubic_volume_ft"]
+    # Build shipment and summary tables after filtering
+    shipments = build.shipments(stock)
+    summary = build.summary(shipments)
     
     return render_template('table_viewer.html',
-                           tables=[shipment_view.to_html(classes='shipments_all')],
-                           titles = ['All Shipments'],
-                           shipment_size=len(shipment_view.index)
+                           tables=[summary.to_html(classes='shipments_all'),
+                                   shipments.to_html(classes='shipments_all')],
+                           titles = ['All Items and their Shipments'], 
+                           shipment_size=summary['Total Shipments'][0]
                           )
 
 if __name__ == "__main__":
