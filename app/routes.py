@@ -44,6 +44,7 @@ def shipments():
                            titles = ['All Items and their Shipments'], 
                            shipment_size=summary['Total Shipments'][0]
                           )
+
 @app.route("/shipments/json")
 def json_data():
     import pandas as pd
