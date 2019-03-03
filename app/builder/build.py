@@ -57,6 +57,15 @@ def shipments(stock) :
     return shipments
 
 def summary(shipments):
+    """
+    Builds summary statistics from a shipments DataFrame
+    Assumes columns within named
+     item_id
+     cubic_volume_ft
+     item_group
+    Situationally may use
+     shipment_id
+    """
     
     # Build initial summaries based on items and cubic volume in feet
     data = {'Total Items' : len(shipments.item_id.values),
