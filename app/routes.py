@@ -21,7 +21,9 @@ def index():
 
 #stock = build.items()
 stock = clean.clean_csv()
-shipments = build.shipments(stock).reset_index(drop=True)
+shipments = (build.shipments(stock)
+                  .set_index('shipment_id')
+            )
 
 @app.route("/notes")
 def notes():
@@ -55,7 +57,8 @@ def shipment_json_data(shipments):
 shipments_filtered = {}
 for group in grouping.get_groups(stock):
     stock_filtered = stock[stock.item_group.values == group]
-    shipments_filtered[group] = build.shipments(stock_filtered)
+    shipments_filtered[group] = (build.shipments(stock_filtered)
+                                )
 
 @app.route('/item_group/<group>')
 def show_by_group(group):
