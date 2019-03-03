@@ -68,6 +68,3 @@ def show_by_group(group):
                            titles = ['All Items and their Shipments'], 
                            shipment_size=summary['Total Shipments'][0]
                           )
-
-if __name__ == "__main__":
-    app.run(debug=True)
