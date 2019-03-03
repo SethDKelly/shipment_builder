@@ -10,14 +10,11 @@
 * ~~Update shipment building module naming schema~~ (2/28/19)
 * ~~Build summary table function~~
  * ~~Add summary tables to route functions for display~~
+* ~~Build group by item_id functionality; Add to view.html to properly display~~ (3/03/19)
+* ~~Build data creation, uses test.csv, package contains dataframe and csv generator~~
 
 ### To-do Tasks in quasi order
-* Build group by item_id functionality; Add to view.html to properly display
-* Build data creation;
-~~Prototype~~;
-Will use test.csv to build from;
-Will create multiple .csv;
-Imitates multiple orders coming in at a time for shipment
+* Build SQLite connections
 * Update index page for shipment building and data creation buttons
 * Static tables on routing
 * Build SQLite db to host after files have been created
