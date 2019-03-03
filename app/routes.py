@@ -19,8 +19,9 @@ def index():
     
     return render_template("index.html", title="Home")
 
+#stock = build.items()
 stock = clean.clean_csv()
-shipments = build.shipments(stock)
+shipments = build.shipments(stock).reset_index(drop=True)
 
 @app.route("/notes")
 def notes():

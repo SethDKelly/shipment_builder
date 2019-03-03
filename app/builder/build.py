@@ -52,18 +52,18 @@ def shipments(stock) :
 def summary(shipments):
     
     # Build initial summaries based on items and cubic volume in feet
-    data = {'Total Items' : len(shipments.item_id),
-            'Total Cubic Volume in Feet' : shipments.cubic_volume_ft.sum(),
+    data = {'Total Items' : len(shipments.item_id.values),
+            'Total Cubic Volume in Feet' : (shipments.cubic_volume_ft.values.sum()),
             'Total Item Groups' : len(shipments.item_group.unique())}
     
     # Check for shipment id and build additional shipment summaries
     if 'shipment_id' in shipments.keys() :
         data['Total Shipments'] = len(shipments.shipment_id.unique())
-        data['Cubic Volume not Utilized'] = (1.58*len(shipments.shipment_id.unique()) - shipments.cubic_volume_ft.sum())
-        data['Percent Cubic Volume not Utilized'] = round(((1.58 * len(shipments.shipment_id.unique()) - shipments.cubic_volume_ft.sum()) / 
-                                                     shipments.cubic_volume_ft.sum()) * 100, 2)
+        data['Shipment Item Ratio'] = len(shipments.item_id.values) / len(shipments.shipment_id.unique())
+        data['Cubic Volume not Utilized'] = (1.58*len(shipments.shipment_id.unique()) - shipments.cubic_volume_ft.values.sum())
+        data['Percent Cubic Volume not Utilized'] = round(((1.58 * len(shipments.shipment_id.unique()) - shipments.cubic_volume_ft.values.sum()) / 
+                                                     shipments.cubic_volume_ft.values.sum()) * 100, 2)
     # return resulting summary as a DataFrame
     return (pd.DataFrame(data, 
-                         index=[0])
-              .rename({0:'Details'})
+                         index=['Details'])
            )
