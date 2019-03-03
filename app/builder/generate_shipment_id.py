@@ -1,7 +1,8 @@
 def generate_shipment_id():
-    
-    # Generates an interger shipment id based on datetime
-    #Year Month Day Hour Minute Seconds Milleseconds
+    """
+    Generates an interger shipment id based on datetime
+    Year Month Day Hour Minute Seconds Milleseconds
+    """
     
     import re
     import datetime
