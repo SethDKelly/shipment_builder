@@ -50,7 +50,7 @@ def shipments(stock) :
                 bundle = bundle.append(item)
                 
         #Issue a shipment id to the bundle
-        bundle["shipment_id"] = generate_shipment_id()
+        bundle["shipment_id"] = gen_id.generate_shipment_id()
 
         #Add bundle to the shipment file
         shipments = shipments.append(bundle)

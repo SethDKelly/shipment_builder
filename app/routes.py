@@ -20,9 +20,7 @@ def index():
     return render_template("index.html", title="Home")
 
 #stock = build.items()
-stock = (clean.clean_csv()
-              .sort_values('cubic_volume_ft')
-        )
+stock = clean.clean_csv()
 shipments = build.shipments(stock)
 
 @app.route("/notes")
