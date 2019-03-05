@@ -20,8 +20,7 @@ def index():
     return render_template("index.html", title="Home")
 
 #stock = build.items()
-stock = clean.clean_csv()
-shipments = build.shipments(stock)
+
 
 @app.route("/notes")
 def notes():
@@ -30,7 +29,7 @@ def notes():
     
 @app.route("/data")
 def show_data():    
-    summary = build.summary(stock)
+    summary = build.item_summary(stock)
     
     return render_template('table_viewer.html',
                            tables=[summary.to_html(classes='shipments_all'),
@@ -39,24 +38,36 @@ def show_data():
 
 @app.route("/shipments")
 def show_shipments():
-    summary = build.summary(shipments)
+    stock = clean.clean_csv()
+    
+    shipment = build.shipments(stock)
+    
+    shipment = pd.concat(shipment.values(), 
+                         keys=shipment.keys())
+    
+    summary = build.summary(shipment)
     
     return render_template('table_viewer.html',
                            tables=[summary.to_html(classes='shipments_all'),
-                                   (shipments.set_index('shipment_id')
-                                             .to_html(classes='shipments_all'))],
+                                   (shipment.to_html(classes='shipments_all'))],
                            titles = ['All Items and their Shipments'], 
-                           shipment_size=summary['Total Shipments'][0]
+                           shipment_size=summary['Total shipments'][0]
                           )
 
 @app.route("/shipments/json")
-def shipment_json_data(shipments):
-    return shipments.to_json(orient='records')
+def shipment_json_data(shipment):
+    return shipment.to_json(orient='records')
 
+stock = clean.clean_csv()
 shipments_filtered = {}
+
 for group in grouping.get_groups(stock):
+    
     stock_filtered = stock[stock.item_group.values == group]
-    shipments_filtered[group] = build.shipments(stock_filtered)
+    
+    shipment_filtered = build.shipments(stock_filtered)
+    shipments_filtered[group] = pd.concat(shipment_filtered.values(), 
+                                         keys=shipment_filtered.keys())
 
 @app.route('/item_group/<group>')
 def show_by_group(group):
@@ -65,8 +76,7 @@ def show_by_group(group):
     
     return render_template('table_viewer.html',
                            tables=[summary.to_html(classes='shipments_all'),
-                                   (shipments_filtered[group].set_index('shipment_id')
-                                                             .to_html(classes='shipments_all'))],
+                                   (shipments_filtered[group].to_html(classes='shipments_all'))],
                            titles = ['All Items and their Shipments'], 
-                           shipment_size=summary['Total Shipments'][0]
+                           shipment_size=summary['Total shipments'][0]
                           )
