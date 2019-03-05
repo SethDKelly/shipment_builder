@@ -22,8 +22,17 @@ def items():
            )
         
 def shipments(stock) :
+    """
+    Takes a pandas DataFrame with assumed columns:
+     item_id
+     cubic_volume_ft
+     item_group
+    
+    Returns a dictionary with shipment_id's as the keys
+    Values stored are pandas DataFrames of item 'bundles'
+    """
     # Create a blank shipment sheet
-    shipments = pd.DataFrame()
+    shipments = {}
     
     while stock.empty == False :
 
@@ -50,10 +59,8 @@ def shipments(stock) :
                 bundle = bundle.append(item)
                 
         #Issue a shipment id to the bundle
-        bundle["shipment_id"] = gen_id.generate_shipment_id()
+        shipments[gen_id.generate_shipment_id()] = bundle
 
-        #Add bundle to the shipment file
-        shipments = shipments.append(bundle)
     return shipments
 
 def summary(shipments):
@@ -69,20 +76,19 @@ def summary(shipments):
     
     # Build initial summaries based on items and cubic volume in feet
     data = {'Total Items' : len(shipments.item_id.values),
-            'Total Cubic Volume in Feet' : (shipments.cubic_volume_ft.values.sum())}
+            'Total Cubic Volume in Feet' : shipments.cubic_volume_ft.values.sum(),
+            'Total Item Groups' : len(shipments.item_group.unique())}
     
-    # When the table only contains a single item don't include it in the summary
-    if len(shipments.item_group.unique()) > 1:
-        data['Total Item Groups'] = len(shipments.item_group.unique())
-        
     # Check for shipment id and build additional shipment summaries
-    if 'shipment_id' in shipments.keys() :
-        data['Total Shipments'] = len(shipments.shipment_id.unique())
-        data['Shipment Item Ratio'] = len(shipments.item_id.values) / len(shipments.shipment_id.unique())
-        data['Cubic Volume not Utilized'] = (1.58*len(shipments.shipment_id.unique()) - shipments.cubic_volume_ft.values.sum())
-        data['Percent Cubic Volume not Utilized'] = round(((1.58 * len(shipments.shipment_id.unique()) -
+    if shipment.index.get_level_values(0).any() :
+        shipment_id = shipment.index.get_level_values(0).unique()
+        data['Total Shipments'] = len(shipment_id)
+        data['Shipment Item Ratio'] = round(len(shipments.item_id.values) / len(shipment_id),2)
+        data['Cubic Volume not Utilized'] = (1.58*len(shipment_id) - 
+                                             shipments.cubic_volume_ft.values.sum())
+        data['Percent Cubic Volume not Utilized'] = round(((1.58 * len(shipment_id) - 
                                                             shipments.cubic_volume_ft.values.sum()) / 
-                                                           shipments.cubic_volume_ft.values.sum()) * 100, 2)
+                                                     shipments.cubic_volume_ft.values.sum()) * 100, 2)
     # return resulting summary as a DataFrame
     return (pd.DataFrame(data, 
                          index=['Details'])
