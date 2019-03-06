@@ -1,7 +1,7 @@
-from app.builder import generate_shipment_id as gen_id
+from app.models.generate import shipment_id
 import pandas as pd
 
-def items():
+def stockFromDataTMP():
     
     """
     Check app/data/tmp/ for any .csv data
@@ -59,11 +59,11 @@ def shipments(stock) :
                 bundle = bundle.append(item)
                 
         #Issue a shipment id to the bundle
-        shipment[gen_id.generate_shipment_id()] = bundle
+        shipment[shipment_id()] = bundle
 
     return shipment
 
-def item_summary(shipment):
+def items_summary(shipment):
     """
     Builds summary statistics from a shipments DataFrame
     Assumes columns within named
@@ -95,7 +95,7 @@ def item_summary(shipment):
                          index=['Details'])
            )
 
-def summary(shipment):
+def dataframe_summary(shipment):
     """
     Builds summary statistics from a shipments DataFrame
     Assumes columns within named

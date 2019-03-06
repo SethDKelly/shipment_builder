@@ -1,14 +1,14 @@
-from app.clean import clean_csv()
+from app.models.clean import clean_csv()
 import pandas as pd
+from re import sub
+from random import randint
 
-def dataframe_generator():
+def dfTestData():
     
     # Builds anywhere from 150-250 rows of data that matches what comes from items.csv
     # Creates random 'keys' that it merges with the stock data based on index
     # returns the data as pandas DataFrame
-    
-    import random
-    
+        
     return (pd.DataFrame(data = {'key': [random.randint(0,199) for x in range(random.randint(150,250))]})
               .merge(clean_csv(), 
                      left_on='key', 
@@ -18,14 +18,12 @@ def dataframe_generator():
               .reset_index(drop=True)
            )
 
-def csv_generator():    
+def csvTestData():    
     # Builds anywhere from 150-250 rows of data that matches what comes from items.csv
     # Creates random 'keys' that it merges with the stock data based on index
     # returns the data as .csv's
     
-    import random
     import glob
-    import re
     
     count = sorted([int(re.sub("[^0-9]", "", files)) for files in glob.glob("app/data/tmp/*.csv")])[-1] + 1
     if not count: 
@@ -40,3 +38,13 @@ def csv_generator():
               .reset_index(drop=True)
            ).to_csv("app/data/tmp/items"+str(count)+".csv", 
                     index=False)
+
+def shipment_id():
+    """
+    Generates an interger shipment id based on datetime
+    Year Month Day Hour Minute Seconds Milleseconds
+    """
+    
+    import datetime
+    
+    return int(re.sub("[^0-9]", "", str(datetime.datetime.today()))[:17])
