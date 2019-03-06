@@ -13,12 +13,14 @@
 * ~~Static tables on routing~~ (3/02/19)
 * ~~Build group by item_id functionality; Add to view.html to properly display~~ (3/03/19)
 * ~~Build data creation, uses test.csv, package contains dataframe and csv generator~~
+* ~~Update index page for shipment building and data creation buttons~~ (3/05/19)
+* ~~Build SQLite connections~~
+* ~~Removal of old .csv files after .db upload~~
+* ~~Implement base 404 and 410 exception handling~~
 
 ### To-do Tasks in quasi order
-* Build SQLite connections
-* Update index page for shipment building and data creation buttons
+* Pass shipment variable through routes
 * Build SQLite db to host after files have been created
-* Removal of old .csv files after .db upload
 
 ### Future ideas
 * Cubic Volume utilization graph of shipments
