@@ -23,13 +23,18 @@ def csvTestData():
     # Creates random 'keys' that it merges with the stock data based on index
     # returns the data as .csv's
     
+    import random
     import glob
+    import re
     
-    count = sorted([int(sub("[^0-9]", "", files)) for files in glob.glob("app/data/tmp/*.csv")])[-1] + 1
-    if not count: 
-        count = '1'        
-    
-    return (pd.DataFrame(data = {'key': [randint(0,199) for x in range(randint(150,250))]})
+    # Checks to make sure there are no files
+    # If there are no files, file name should start with 1
+    if not sorted([int(re.sub("[^0-9]", "", files)) for files in glob.glob("app/data/tmp/*.csv")]):
+        count = '1'
+    else : # Start naming at whatever we're at +1
+        count = sorted([int(re.sub("[^0-9]", "", files)) for files in glob.glob("app/data/tmp/*.csv")])[-1] + 1
+
+    return (pd.DataFrame(data = {'key': [random.randint(0,199) for x in range(random.randint(150,250))]})
               .merge(clean_csv(), 
                      left_on='key', 
                      right_index=True)
