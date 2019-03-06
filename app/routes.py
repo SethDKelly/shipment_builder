@@ -4,7 +4,7 @@ from app.models import build, clean, generate, grouping
 
 # import libraries
 import pandas as pd
-from flask import render_template, Response
+from flask import render_template, Response, redirect, url_for
 
 
 """
@@ -23,32 +23,37 @@ def index():
     
     return render_template("index.html", title="Home")
 
-#stock = build.items()
-
 @app.route("/build/shipment")
 def buildShipment():
     from sqlalchemy import create_engine
     
     # Pull all data from app/data/tmp
-    # stock = build.items()
+     stock = build.stockFromDataTMP()
+
+        if stock.any(): # Check if there is any stock to process
+
+        clean.deleteCSV() # Remove old csv files
+
+        # Build shipments from stock and transform 
+        shipment = build.shipments(stock)
+        shipment = pd.concat(shipment.values(), 
+                             keys=shipment.keys())
+
+        engine = create_engine('sqlite:///app/data/db/shipment.db', echo=False)
+
+        # future implementations will increase the dataframe columns:
+            # 
+        shipment.to_sql('shipment', con=engine, if_exists='append')
     
-    # Pull data from items.csv
-    stock = clean.clean_csv()
-    
-    # Build shipments from stock and transform 
-    shipment = build.shipments(stock)
-    shipment = pd.concat(shipment.values(), 
-                         keys=shipment.keys())
-    
-    engine = create_engine('sqlite:///app/data/db/shipment.db', echo=False)
-    shipment.to_sql('shipment', con=engine, if_exists='replace')
-    
-    return()
+    return redirect(url_for('index'))
 
 @app.route("/build/data")
 def buildData():
+    # This route will create a new test csv
+    # Then redirect back to index
+    
     generate.csvTestData()
-    return render_template("index.html", title="Home")
+    return redirect(url_for('index'))
 
 @app.route("/notes")
 def notes():
