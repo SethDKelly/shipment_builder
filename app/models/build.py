@@ -63,7 +63,7 @@ def shipments(stock) :
 
     return shipment
 
-def items_summary(shipment):
+def stockSummary(shipment):
     """
     Builds summary statistics from a shipments DataFrame
     Assumes columns within named
@@ -95,7 +95,7 @@ def items_summary(shipment):
                          index=['Details'])
            )
 
-def dataframe_summary(shipment):
+def dfSummary(shipment):
     """
     Builds summary statistics from a shipments DataFrame
     Assumes columns within named

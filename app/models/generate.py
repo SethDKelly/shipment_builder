@@ -1,4 +1,4 @@
-from app.models.clean import clean_csv()
+from app.models.clean import clean_csv
 import pandas as pd
 from re import sub
 from random import randint
@@ -25,7 +25,7 @@ def csvTestData():
     
     import glob
     
-    count = sorted([int(re.sub("[^0-9]", "", files)) for files in glob.glob("app/data/tmp/*.csv")])[-1] + 1
+    count = sorted([int(sub("[^0-9]", "", files)) for files in glob.glob("app/data/tmp/*.csv")])[-1] + 1
     if not count: 
         count = '1'        
     
@@ -47,4 +47,4 @@ def shipment_id():
     
     import datetime
     
-    return int(re.sub("[^0-9]", "", str(datetime.datetime.today()))[:17])
+    return int(sub("[^0-9]", "", str(datetime.datetime.today()))[:17])

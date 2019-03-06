@@ -1,12 +1,16 @@
 # import modules
 from app import app
-from app.builder import build
-from app import clean
-from app import grouping
+from app.models import build, clean, generate, grouping
 
 # import libraries
 import pandas as pd
 from flask import render_template, Response
+
+
+"""
+Before anything else do:
+"""
+stock = clean.clean_csv()
 
 # create route that renders index.html template
 @app.route("/")
@@ -29,7 +33,7 @@ def notes():
     
 @app.route("/data")
 def show_data():    
-    summary = build.item_summary(stock)
+    summary = build.stockSummary(stock)
     
     return render_template('table_viewer.html',
                            tables=[summary.to_html(classes='shipments_all'),
@@ -38,14 +42,13 @@ def show_data():
 
 @app.route("/shipments")
 def show_shipments():
-    stock = clean.clean_csv()
     
     shipment = build.shipments(stock)
     
     shipment = pd.concat(shipment.values(), 
                          keys=shipment.keys())
     
-    summary = build.summary(shipment)
+    summary = build.dfSummary(shipment)
     
     return render_template('table_viewer.html',
                            tables=[summary.to_html(classes='shipments_all'),
@@ -58,7 +61,6 @@ def show_shipments():
 def shipment_json_data(shipment):
     return shipment.to_json(orient='records')
 
-stock = clean.clean_csv()
 shipments_filtered = {}
 
 for group in grouping.get_groups(stock):
@@ -72,7 +74,7 @@ for group in grouping.get_groups(stock):
 @app.route('/item_group/<group>')
 def show_by_group(group):
     
-    summary = build.summary(shipments_filtered[group])
+    summary = build.dfSummary(shipments_filtered[group])
     
     return render_template('table_viewer.html',
                            tables=[summary.to_html(classes='shipments_all'),
