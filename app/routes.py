@@ -4,13 +4,12 @@ from app.models import build, clean, generate, grouping
 
 # import libraries
 import pandas as pd
-from flask import render_template, Response, redirect, url_for, request, abort()
+from flask import render_template, Response, redirect, url_for, request, abort
 
 
 """
 Before anything else do:
 """
-stock = clean.clean_csv()
 
 # create route that renders index.html template
 @app.route("/")
@@ -31,8 +30,10 @@ def buildShipment():
     stock = build.stockFromDataTMP()
 
      
-    if not stock.empty: # Check if there is any stock to process
-
+    if stock.empty: # If there isn't any stock to process
+        abort(410)
+        
+    else: # If there is stock to process
         clean.deleteCSV() # Remove old csv files
 
         # Build shipments from stock and transform 
@@ -44,10 +45,7 @@ def buildShipment():
 
         # future implementations will increase the dataframe columns:
             # Add in a date, possible timestamp (hour:min)
-        shipment.to_sql('shipment', con=engine, if_exists='append')
-        
-    else:
-        abort(410)
+        shipment.to_sql('shipment', con=engine, if_exists='append')        
     
     return redirect(url_for('index', shipment=shipment))
 
@@ -94,6 +92,7 @@ def show_shipments():
 def shipment_json_data(shipment):
     return shipment.to_json(orient='records')
 
+""" OLD FORMAT
 shipments_filtered = {}
 
 for group in grouping.get_groups(stock):
@@ -103,6 +102,7 @@ for group in grouping.get_groups(stock):
     shipment_filtered = build.shipments(stock_filtered)
     shipments_filtered[group] = pd.concat(shipment_filtered.values(), 
                                          keys=shipment_filtered.keys())
+"""
 
 @app.route('/item_group/<group>')
 def show_by_group(group):
@@ -115,3 +115,17 @@ def show_by_group(group):
                            titles = ['All Items and their Shipments'], 
                            shipment_size=summary['Total shipments'][0]
                           )
+
+"""
+ERROR Exception handling this section should be refactored at some point
+"""
+
+@app.errorhandler(404)
+def page_not_found(e):
+    # note that we set the 404 status explicitly
+    return render_template('error404.html'), 404
+
+@app.errorhandler(410)
+def page_not_found(e):
+    # note that we set the 410 status explicitly
+    return render_template('error410.html'), 410
