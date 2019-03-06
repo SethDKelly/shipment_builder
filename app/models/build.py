@@ -16,11 +16,13 @@ def stockFromDataTMP():
     stock = pd.DataFrame()
     for csv in glob.glob("app/data/tmp/*.csv"):
         stock = stock.append(pd.read_csv(csv))
+        
     if stock.empty:
         return stock
+    
     else :
-        return (stock.reset_index(drop=True)
-                     .sort_values('cubic_volume_ft')
+        return (stock.sort_values('cubic_volume_ft')
+                     .reset_index(drop=True)
                )
         
 def shipments(stock) :

@@ -29,23 +29,20 @@ def buildShipment():
     # Pull all data from app/data/tmp
     stock = build.stockFromDataTMP()
 
-     
-    if stock.empty: # If there isn't any stock to process
-        abort(410)
-        
-    else: # If there is stock to process
+    if not stock.empty: # If there isn't any stock to process
         clean.deleteCSV() # Remove old csv files
 
         # Build shipments from stock and transform 
         shipment = build.shipments(stock)
-        shipment = pd.concat(shipment.values(), 
-                         keys=shipment.keys())
         
         engine = create_engine('sqlite:///app/data/db/shipment.db', echo=False)
-
+        
+        shipment_df = pd.concat(shipment.values(), 
+                         keys=shipment.keys())
+        
         # future implementations will increase the dataframe columns:
             # Add in a date, possible timestamp (hour:min)
-        shipment.to_sql('shipment', con=engine, if_exists='append')        
+        shipment_df.to_sql('shipment', con=engine, if_exists='append')     
     
     return redirect(url_for('index', shipment=shipment))
 
@@ -64,7 +61,8 @@ def notes():
         return Response(notes.read(), mimetype='text/plain')
     
 @app.route("/data")
-def show_data():   
+def show_data():
+
     summary = build.stockSummary(stock)
     
     return render_template('table_viewer.html',
@@ -76,9 +74,11 @@ def show_data():
 def show_shipments():
     
     if not request.args.get(shipment, None):
-        abort()
+        abort(404)
+     
     shipment = request.args.get(shipment, None)
-    
+    shipment_df = pd.concat(shipment.values(), 
+                         keys=shipment.keys())
     summary = build.dfSummary(shipment)
     
     return render_template('table_viewer.html',
