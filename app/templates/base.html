@@ -76,7 +76,7 @@
             <a href="/index">Home</a>
             <a href="/notes">Notes</a>
             <a href="/data">Data</a>
-            <a href="/shipments">Shipments</a>
+            <a href="{{ url_for('show_shipments', shipment=shipment) }}">Shipments</a>
           <div class="dropdown">
           <button class="dropbtn" onclick="myFunction()">Group
             <i class="fa fa-caret-down"></i>

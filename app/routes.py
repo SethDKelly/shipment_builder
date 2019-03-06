@@ -4,7 +4,7 @@ from app.models import build, clean, generate, grouping
 
 # import libraries
 import pandas as pd
-from flask import render_template, Response, redirect, url_for
+from flask import render_template, Response, redirect, url_for, request, abort()
 
 
 """
@@ -28,27 +28,32 @@ def buildShipment():
     from sqlalchemy import create_engine
     
     # Pull all data from app/data/tmp
-     stock = build.stockFromDataTMP()
+    stock = build.stockFromDataTMP()
 
-        if stock.any(): # Check if there is any stock to process
+     
+    if not stock.empty: # Check if there is any stock to process
 
         clean.deleteCSV() # Remove old csv files
 
         # Build shipments from stock and transform 
         shipment = build.shipments(stock)
         shipment = pd.concat(shipment.values(), 
-                             keys=shipment.keys())
-
+                         keys=shipment.keys())
+        
         engine = create_engine('sqlite:///app/data/db/shipment.db', echo=False)
 
         # future implementations will increase the dataframe columns:
-            # 
+            # Add in a date, possible timestamp (hour:min)
         shipment.to_sql('shipment', con=engine, if_exists='append')
+        
+    else:
+        abort(410)
     
-    return redirect(url_for('index'))
+    return redirect(url_for('index', shipment=shipment))
 
 @app.route("/build/data")
 def buildData():
+    
     # This route will create a new test csv
     # Then redirect back to index
     
@@ -61,7 +66,7 @@ def notes():
         return Response(notes.read(), mimetype='text/plain')
     
 @app.route("/data")
-def show_data():    
+def show_data():   
     summary = build.stockSummary(stock)
     
     return render_template('table_viewer.html',
@@ -72,10 +77,9 @@ def show_data():
 @app.route("/shipments")
 def show_shipments():
     
-    shipment = build.shipments(stock)
-    
-    shipment = pd.concat(shipment.values(), 
-                         keys=shipment.keys())
+    if not request.args.get(shipment, None):
+        abort()
+    shipment = request.args.get(shipment, None)
     
     summary = build.dfSummary(shipment)
     
