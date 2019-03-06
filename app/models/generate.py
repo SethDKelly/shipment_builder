@@ -29,7 +29,7 @@ def csvTestData():
     if not count: 
         count = '1'        
     
-    return (pd.DataFrame(data = {'key': [random.randint(0,199) for x in range(random.randint(150,250))]})
+    return (pd.DataFrame(data = {'key': [randint(0,199) for x in range(randint(150,250))]})
               .merge(clean_csv(), 
                      left_on='key', 
                      right_index=True)

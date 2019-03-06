@@ -48,7 +48,7 @@ def buildShipment():
 @app.route("/build/data")
 def buildData():
     generate.csvTestData()
-    return None
+    return render_template("index.html", title="Home")
 
 @app.route("/notes")
 def notes():
