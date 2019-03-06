@@ -25,6 +25,30 @@ def index():
 
 #stock = build.items()
 
+@app.route("/build/shipment")
+def buildShipment():
+    from sqlalchemy import create_engine
+    
+    # Pull all data from app/data/tmp
+    # stock = build.items()
+    
+    # Pull data from items.csv
+    stock = clean.clean_csv()
+    
+    # Build shipments from stock and transform 
+    shipment = build.shipments(stock)
+    shipment = pd.concat(shipment.values(), 
+                         keys=shipment.keys())
+    
+    engine = create_engine('sqlite:///app/data/db/shipment.db', echo=False)
+    shipment.to_sql('shipment', con=engine, if_exists='replace')
+    
+    return()
+
+@app.route("/build/data")
+def buildData():
+    generate.csvTestData()
+    return None
 
 @app.route("/notes")
 def notes():
