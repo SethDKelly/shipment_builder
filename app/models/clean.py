@@ -22,3 +22,11 @@ def clean_csv():
         Handling NaN values beyond just dropping them
         Include column testing to ensure data types
     '''
+
+def deleteCSV():
+    import os
+    import glob
+
+    files = glob.glob('app/data/tmp/*.csv')
+    for f in files:
+        os.remove(f)
