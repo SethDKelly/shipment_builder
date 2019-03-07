@@ -76,7 +76,7 @@ def shipments(stock) :
             # If it fits it sits
             # Add the item to the bundle
             # Drop item from the stock
-            elif (bundle.cubic_volume_ft.sum() + item.cubic_volume_ft) <= 1.58 :
+            elif (bundle_volume + item.cubic_volume_ft) <= 1.58 :
                 item, stock = (item, stock.drop(index))
                 shipment['item_id'].update({(shipment_id, 
                                         index) : item.item_id
