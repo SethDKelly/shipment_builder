@@ -29,7 +29,9 @@ def buildShipment():
     # Pull all data from app/data/tmp
     stock = build.stockFromDataTMP()
 
-    if not stock.empty: # If there isn't any stock to process
+    if stock.empty: # If there isn't any stock to process
+        pass
+    else:
         clean.deleteCSV() # Remove old csv files
 
         # Build shipments from stock and transform 
@@ -42,9 +44,12 @@ def buildShipment():
         
         # future implementations will increase the dataframe columns:
             # Add in a date, possible timestamp (hour:min)
-        shipment_df.to_sql('shipment', con=engine, if_exists='append')     
+        shipment_df.to_sql('shipment', con=engine, if_exists='append')
+        
+        shipment_json = shipment_df.to_json(orient='records')
     
-    return redirect(url_for('index', shipment=shipment))
+    return render_template('index.html',
+                           url_for('show_shipment', shipment=shipment_json)
 
 @app.route("/build/data")
 def buildData():
