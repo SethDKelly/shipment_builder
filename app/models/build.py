@@ -1,4 +1,4 @@
-from app.models.generate import shipment_id
+from app.models.generate import shipment_id as gen_id
 import pandas as pd
 
 def stockFromDataTMP():
@@ -26,33 +26,51 @@ def stockFromDataTMP():
                )
         
 def shipments(stock) :
+    
     """
     Takes a pandas DataFrame with assumed columns:
      item_id
      cubic_volume_ft
      item_group
     
-    Returns a dictionary with shipment_id's as the keys
-    Values stored are pandas DataFrames of item 'bundles'
+    Returns a dictionary
     """
-    # Create a blank shipment dictionary
-    shipment = {}
+
+    # Create a blank shipment sheet
+    shipment = {'cubic_volume_ft':{},
+                'item_group':{},
+                'item_id':{}
+               }
     
     while stock.empty == False :
 
         # Get the largest item by cubic volume and remove from stock
         bundle, stock = stock.tail(1), stock.drop(stock.tail(1).index, axis=0)
+        
+        # Generate shipment_id
+        shipment_id = gen_id()
 
+        shipment['cubic_volume_ft'].update({(shipment_id, 
+                                        bundle.index[0]) : bundle.cubic_volume_ft.values[0]})
+        
+        shipment['item_group'].update({(shipment_id, 
+                                   bundle.index[0]) : bundle.item_group.values[0]})
+        
+        shipment['item_id'].update({(shipment_id, 
+                                bundle.index[0]) : bundle.item_id.values[0]})
+
+        bundle_volume = shipment['cubic_volume_ft'][(shipment_id, 
+                                                     bundle.index[0])]
+        
         # Filter the remaining stock by what CAN still fit in the box
         # Grab the index of the item and the item
-
-        for index, item in (stock[stock.cubic_volume_ft.values < (1.58 - bundle.cubic_volume_ft.values)]
+        for index, item in (stock[stock.cubic_volume_ft.values < (1.58 - bundle_volume)]
                             .sort_values("cubic_volume_ft",
                                          ascending=False)
                            ).iterrows():
             
             # If there is no item in stock that could fit into the bundle break out of the matrix
-            if (bundle.cubic_volume_ft.sum() + stock.cubic_volume_ft.values.min()) > 1.58 :
+            if (bundle_volume + stock.cubic_volume_ft.values.min()) > 1.58 :
                 break
                 
             # If it fits it sits
@@ -60,11 +78,17 @@ def shipments(stock) :
             # Drop item from the stock
             elif (bundle.cubic_volume_ft.sum() + item.cubic_volume_ft) <= 1.58 :
                 item, stock = (item, stock.drop(index))
-                bundle = bundle.append(item)
+                shipment['item_id'].update({(shipment_id, 
+                                        index) : item.item_id
+                                      })
+                shipment['item_group'].update({(shipment_id, 
+                                           index) : item.item_group
+                                        })
+                shipment['cubic_volume_ft'].update({(shipment_id, 
+                                                index) : item.cubic_volume_ft
+                                              })
                 
-        #Issue a shipment id to the bundle
-        shipment[shipment_id()] = bundle
-
+                bundle_volume += shipment['cubic_volume_ft'][(shipment_id, index)]
     return shipment
 
 def stockSummary(shipment):

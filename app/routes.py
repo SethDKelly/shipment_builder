@@ -5,7 +5,7 @@ from app.models import build, clean, generate, grouping
 # import libraries
 import pandas as pd
 from flask import render_template, Response, redirect, url_for, request, abort
-
+import sqlalchemy as db
 
 """
 Before anything else do:
@@ -22,9 +22,8 @@ def index():
     
     return render_template("index.html", title="Home")
 
-@app.route("/build/shipment")
-def buildShipment():
-    from sqlalchemy import create_engine
+@app.route("/loadData")
+def loadData():
     
     # Pull all data from app/data/tmp
     stock = build.stockFromDataTMP()
@@ -33,26 +32,24 @@ def buildShipment():
         pass
     else:
         clean.deleteCSV() # Remove old csv files
-
-        # Build shipments from stock and transform 
-        shipment = build.shipments(stock)
         
-        engine = create_engine('sqlite:///app/data/db/shipment.db', echo=False)
-        
-        shipment_df = pd.concat(shipment.values(), 
-                         keys=shipment.keys())
+        engine = db.create_engine('sqlite:///app/data/db/shipment.db')
         
         # future implementations will increase the dataframe columns:
             # Add in a date, possible timestamp (hour:min)
-        shipment_df.to_sql('shipment', con=engine, if_exists='append')
+        stock.to_sql('stock', con=engine, if_exists='replace',index=False, method='multi')
         
-        shipment_json = shipment_df.to_json(orient='records')
-    
-    return render_template('index.html',
-                           url_for('show_shipment', shipment=shipment_json)
+        """ POSSIBLE FUTURE IMPLEMENTATION - NEED FOR SPEED
+        Session = sessionmaker(bind=dest_db_con)
+        session = Session()
+        session.bulk_insert_mappings(MentorInformation, df.to_dict(orient="records"))
+        session.close()
+        """
+        
+    return redirect(url_for('index'))
 
-@app.route("/build/data")
-def buildData():
+@app.route("/makeData")
+def makeData():
     
     # This route will create a new test csv
     # Then redirect back to index
@@ -67,7 +64,10 @@ def notes():
     
 @app.route("/data")
 def show_data():
-
+    connection = db.create_engine('sqlite:///app/data/db/shipment.db').connect()
+    
+    stock =pd.read_sql_query("SELECT * FROM stock", con=connection)
+    
     summary = build.stockSummary(stock)
     
     return render_template('table_viewer.html',
@@ -78,12 +78,11 @@ def show_data():
 @app.route("/shipments")
 def show_shipments():
     
-    if not request.args.get(shipment, None):
-        abort(404)
-     
-    shipment = request.args.get(shipment, None)
-    shipment_df = pd.concat(shipment.values(), 
-                         keys=shipment.keys())
+    connection = db.create_engine('sqlite:///app/data/db/shipment.db').connect()
+    
+    stock = pd.read_sql_query("SELECT * FROM stock", con=connection)
+    shipment = pd.DataFrame(build.shipments(stock))
+
     summary = build.dfSummary(shipment)
     
     return render_template('table_viewer.html',
@@ -94,8 +93,11 @@ def show_shipments():
                           )
 
 @app.route("/shipments/json")
-def shipment_json_data(shipment):
-    return shipment.to_json(orient='records')
+def shipment_json_data():
+    
+    connection = db.create_engine('sqlite:///app/data/db/shipment.db').connect()
+    stock = pd.read_sql_query("SELECT * FROM stock", con=connection)
+    return pd.DataFrame(build.shipments(stock)).to_json(orient='records')
 
 """ OLD FORMAT
 shipments_filtered = {}
@@ -111,12 +113,18 @@ for group in grouping.get_groups(stock):
 
 @app.route('/item_group/<group>')
 def show_by_group(group):
+    connection = db.create_engine('sqlite:///app/data/db/shipment.db').connect()
     
-    summary = build.dfSummary(shipments_filtered[group])
+    stock = pd.read_sql_query("SELECT * FROM stock", con=connection)
+    stock_filtered = stock[stock.item_group.values == group]
     
+    shipment = pd.DataFrame(build.shipments(stock_filtered))
+
+    summary = build.dfSummary(shipment)
+        
     return render_template('table_viewer.html',
                            tables=[summary.to_html(classes='shipments_all'),
-                                   (shipments_filtered[group].to_html(classes='shipments_all'))],
+                                   (shipment.to_html(classes='shipments_all'))],
                            titles = ['All Items and their Shipments'], 
                            shipment_size=summary['Total shipments'][0]
                           )
