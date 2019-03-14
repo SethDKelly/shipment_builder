@@ -16,12 +16,6 @@ def clean_csv():
                                ascending=True)
                   .reset_index(drop=True)
             )
-    
-    '''
-    Future implementation will include functionality for: 
-        Handling NaN values beyond just dropping them
-        Include column testing to ensure data types
-    '''
 
 def deleteCSV():
     import os
