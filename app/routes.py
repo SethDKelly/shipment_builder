@@ -57,11 +57,18 @@ def makeData():
     generate.csvTestData()
     return redirect(url_for('index'))
 
+"""
+Removed feature until this is reworked to fit better
+This will implement new notes that will describe
+The new test case example once that is built
+i.e. items.csv -> bananas.csv or so on
+
 @app.route("/notes")
 def notes():
     with open("notes_about_csv_file.txt") as notes :
         return Response(notes.read(), mimetype='text/plain')
-    
+"""
+
 @app.route("/data")
 def show_data():
     connection = db.create_engine('sqlite:///app/data/db/shipment.db').connect()
